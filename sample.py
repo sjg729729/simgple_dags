@@ -29,9 +29,9 @@ with DAG(
         application_file='/path/to/your/dags/spark-job.yaml',  # YAML 파일의 절대 경로
         namespace='spark-jobs',
         kubernetes_conn_id='myk8s',  # Kubernetes Connection ID
-        api_group='sparkoperator.k8s.io',
-        api_version='v1beta2',
-        do_xcom_push=True,
+        # api_group='sparkoperator.k8s.io',
+        # api_version='v1beta2',
+        # do_xcom_push=True,
         dag=dag
     )
     
