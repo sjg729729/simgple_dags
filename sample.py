@@ -1,38 +1,37 @@
 from airflow import DAG
-from datetime import timedelta, datetime
-from airflow.providers.cncf.kubernetes.operators.spark_kubernetes import SparkKubernetesOperator
-from airflow.providers.cncf.kubernetes.sensors.spark_kubernetes import SparkKubernetesSensor
-from airflow.models import Variable
-from kubernetes.client import models as k8s
-from airflow.contrib.operators.kubernetes_pod_operator import KubernetesPodOperator
+from airflow.providers.cncf.kubernetes.operators.kubernetes_pod import KubernetesPodOperator
+from airflow.utils.dates import days_ago
 
-default_args={
-   'depends_on_past': False,
-   'email': ['abcd@gmail.com'],
-   'email_on_failure': False,
-   'email_on_retry': False,
-   'retries': 1,
-   'retry_delay': timedelta(minutes=5)
+# 기본 DAG 매개변수 설정
+default_args = {
+    'owner': 'airflow',
+    'start_date': days_ago(1),
+    'retries': 1,
 }
+
+# DAG 정의
 with DAG(
-   'my-second-dag',
-   default_args=default_args,
-   description='simple dag',
-   schedule_interval=timedelta(days=1),
-   start_date=datetime(2022, 11, 17),
-   catchup=False,
-   tags=['example']
+    dag_id='example_kubernetes_pod_operator',
+    default_args=default_args,
+    description='An example DAG using KubernetesPodOperator',
+    schedule_interval='@daily',
+    catchup=False,
 ) as dag:
-   t1 = SparkKubernetesOperator(
-       task_id='n-spark-pi',
-       trigger_rule="all_success",
-       depends_on_past=False,
-       retries=3,
-       application_file="new-spark-pi.yaml",
-       namespace="spark-jobs",
-       kubernetes_conn_id="myk8s",
-       api_group="sparkoperator.k8s.io",
-       api_version="v1beta2",
-       do_xcom_push=True,
-       dag=dag
-   )
+
+    # KubernetesPodOperator를 사용하여 Pod 작업 정의
+    k8s_pod_task = KubernetesPodOperator(
+        task_id='run_python_script',
+        name='python-script-job',
+        namespace='default',  # Pod이 실행될 네임스페이스
+        image='python:3.9',   # 사용할 Docker 이미지
+        cmds=['python', '-c'],  # 실행할 명령
+        arguments=[
+            'print("Hello from Kubernetes Pod!")'
+        ],
+        is_delete_operator_pod=True,  # 작업 완료 후 Pod을 삭제할지 여부
+        get_logs=True,  # Pod 로그를 Airflow 로그로 가져올지 여부
+        dag=dag
+    )
+
+    # DAG의 기본 작업 흐름 정의
+    k8s_pod_task
