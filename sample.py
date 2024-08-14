@@ -27,7 +27,7 @@ with DAG(
     run_spark_job = SparkKubernetesOperator(
         task_id='run_spark_job',
         application_file='/opt/airflow/dags/repo/outside_test.yaml',  # YAML 파일의 절대 경로
-        # namespace='spark-jobs',
+        namespace='spark-jobs',
         kubernetes_conn_id='myk8s',  # Kubernetes Connection ID
         # api_group='sparkoperator.k8s.io',
         # api_version='v1beta2',
