@@ -31,7 +31,7 @@ with DAG(
         kubernetes_conn_id='myk8s',  # Kubernetes Connection ID
         # api_group='sparkoperator.k8s.io',
         # api_version='v1beta2',
-        # do_xcom_push=True,
+        do_xcom_push=True,
         dag=dag
     )
     
