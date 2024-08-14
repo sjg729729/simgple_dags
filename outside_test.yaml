@@ -1,8 +1,8 @@
 apiVersion: "sparkoperator.k8s.io/v1beta2"
 kind: SparkApplication
 metadata:
-  name: pyspark-testbbk
-  namespace: spark-jobs
+  name: pyspark-test12345
+  # namespace: spark-jobs
 spec:
   type: Python
   mode: cluster
